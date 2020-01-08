@@ -8,18 +8,18 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
   getData(search: string) {
-    return this.http.get(`https://pht-api-munonj7kmq-ew.a.run.app/api/chemicals/get?search=${search}`);
+    return this.http.get(`http://localhost:3000/read?search=${search}`);
   }
 
   postData(data: string) {
-    return this.http.post(`https://pht-api-munonj7kmq-ew.a.run.app/api/chemicals/create`, data);
+    return this.http.post(`http://localhost:3000/create`, data);
   }
 
   putData(data: string) {
-     return this.http.put(`https://pht-api-munonj7kmq-ew.a.run.app/api/chemicals/update`, data);
+     return this.http.put(`http://localhost:3000/update`, data);
   }
 
   deleteData(id: number) {
-     return this.http.delete(`https://pht-api-munonj7kmq-ew.a.run.app/api/chemicals/delete/${id}`);
+     return this.http.delete(`http://localhost:3000/delete/${id}`);
   }
 }
