@@ -32,14 +32,6 @@ export class LoginComponent implements OnInit {
     this.auth
       .login(token)
       .pipe(first())
-      .subscribe(
-        data => {
-          console.log(this.auth.currentUser);
-        },
-        error => {
-          //this.alertService.error(error);
-          this.loading = false;
-        }
-      );
+      .subscribe();
   }
 }

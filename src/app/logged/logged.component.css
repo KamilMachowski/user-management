@@ -12,5 +12,8 @@
     float: right;
 }
 #changePassBtn{
-    width: 510px;
+    width: 510px !important;
+}
+#usersManage{
+    width: 300px;
 }

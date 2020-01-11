@@ -1,16 +1,21 @@
 //Initiallising node modules
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongo = require('mongodb');
-var app = express();
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongo = require('mongodb');
+const cors = require('cors');
+const nodemailer = require('nodemailer');
 
-var mc = mongo.MongoClient;
-var url = 'mongodb+srv://wonsz:wonsz_mongo_test@pht-mongodb-52c4w.mongodb.net'; // ?authSource=admin&replicaSet=pht-mongodb-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true';
+const app = express();
+
+const mc = mongo.MongoClient;
+const url =
+  'mongodb+srv://wonsz:wonsz_mongo_test@pht-mongodb-52c4w.mongodb.net'; // ?authSource=admin&replicaSet=pht-mongodb-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true';
 
 // Body Parser Middleware
 app.use(bodyParser.json());
 
 //CORS Middleware
+app.use(ra, origin, "*" );
 app.use(function(req, res, next) {
   //Enabling CORS
   res.header('Access-Control-Allow-Origin', '*');
@@ -26,8 +31,8 @@ app.use(function(req, res, next) {
 });
 
 //Setting up server
-var server = app.listen(process.env.PORT || 3000, function() {
-  var port = server.address().port;
+const server = app.listen(process.env.PORT || 3000, function() {
+  const port = server.address().port;
   console.log('App now running on port', port);
 });
 
@@ -40,7 +45,7 @@ var server = app.listen(process.env.PORT || 3000, function() {
 
 //GET API
 app.get('/read', function(req, res) {
-  var query = req.query.query;
+  const query = req.query.query;
   console.log(`query=${query}`);
   query = JSON.parse(query);
 
@@ -52,7 +57,7 @@ app.get('/read', function(req, res) {
     },
     function(err, db) {
       if (err) throw err;
-      var dbo = db.db('angular');
+      const dbo = db.db('angular');
       //console.log(`query2=${query}`);
       dbo
         .collection('users')
@@ -80,7 +85,7 @@ app.post('/create', function(req, res) {
       },
       function(err, db) {
         if (err) throw err;
-        var dbo = db.db('angular');
+        const dbo = db.db('angular');
         dbo.collection('users').insertOne(item, function(err, res) {
           if (err) throw err;
           db.close();
@@ -97,9 +102,12 @@ app.post('/create', function(req, res) {
 // //PUT API
 app.put('/update', function(req, res) {
   req.on('data', item => {
-    newVal = `{$set: ${item}}`;
+    // newVal = `{$set: ${item}}`;
     item = JSON.parse(item);
     id = `{"_id":"${item._id}"}`;
+    newVal = JSON.stringify(item);
+    //newVal = `{$set: {"name":"Kamil","surname":"Machowski","city":"Kraków","country":"Polan","email":"kamil@machowski.org.pl","token":"undefinedpass","admin":true}}`;
+    //newVal = JSON.parse(newVal);
     console.log(newVal);
     mc.connect(
       url,
@@ -109,11 +117,16 @@ app.put('/update', function(req, res) {
       },
       function(err, db) {
         if (err) throw err;
-        var dbo = db.db('angular');
-        dbo.collection('users').updateOne(id, newVal,{upsert:true}, function(err, res) {
-          if (err) throw err;
-          db.close();
-        });
+        const dbo = db.db('angular');
+        dbo
+          .collection('users')
+          .updateOne(id, { $set: newVal }, { upsert: true }, function(
+            err,
+            res
+          ) {
+            if (err) throw err;
+            db.close();
+          });
       }
     );
   });
@@ -121,7 +134,8 @@ app.put('/update', function(req, res) {
 
 // // DELETE API
 app.delete('/delete/:itemId', function(req, res) {
-  var itemId = JSON.parse(`{"_id":"${req.params.itemId}"}`);
+  //const itemId = JSON.parse(`{"_id":"${req.params.itemId}"}`);
+  const itemId = req.params.itemId;
   console.log(itemId);
   mc.connect(
     url,
@@ -131,21 +145,27 @@ app.delete('/delete/:itemId', function(req, res) {
     },
     function(err, db) {
       if (err) throw err;
-      var dbo = db.db('angular');
-      dbo.collection('users').deleteOne(itemId, function(err, record) {
+      const dbo = db.db('angular');
+      dbo.collection('users').deleteOne({ _id: itemId }, function(err, record) {
         if (err) throw err;
         db.close();
       });
     }
   );
+});
 
-  //   var sqlQuery = `DELETE FROM chemicals WHERE id=${itemId}`;
-  //   var apiResponse = `Item ${itemId} successfully deleted`;
-  //   //var sqlQuery = db.query(`DELETE FROM chemicals WHERE id=${itemId}`);
-
-  //   db.query(sqlQuery, function(error) {
-  //     if (error) throw error;
-  //     res.send(apiResponse);
-  //   });
-  //   //executeQuery(query, apiResponse);
+// Sendmail
+app.post("/sendmail", (req, res) => {
+  console.log("request came");
+  let user = req.body;
+  sendMail(user, (err, info) => {
+    if (err) {
+      console.log(err);
+      res.status(400);
+      res.send({ error: "Failed to send email" });
+    } else {
+      console.log("Email has been sent");
+      res.send(info);
+    }
+  });
 });

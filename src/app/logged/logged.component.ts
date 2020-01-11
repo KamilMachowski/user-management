@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { User } from '../_models/user';
 import { AuthService } from '../auth.service';
 import { ApiService } from '../api.service';
+import { PrintService } from '../print.service';
 
 @Component({
   selector: 'app-logged',
@@ -12,22 +13,34 @@ import { ApiService } from '../api.service';
 export class LoggedComponent implements OnInit {
   editable = false;
   passChange = false;
+
   oldPass = '';
   newPass = '';
   newPass2 = '';
-
+  users: User[];
   @Input() currentUser: User;
   @Input() editBtn = 'Edit Personal Data';
   constructor(
     private router: Router,
     private auth: AuthService,
-    private api: ApiService
+    private api: ApiService,
+    private print :PrintService
   ) {}
 
   ngOnInit() {
-    this.currentUser = this.auth.currentUser;
     if (!this.auth.msg.logged) this.router.navigate(['']);
-    //    console.log(`data from logged ${this.auth.currentUser}`);
+    else {
+      this.currentUser = this.auth.currentUser;
+      this.api.getWeather(this.currentUser.city).subscribe();
+      if (this.currentUser.admin) {
+        this.api
+          .getData('{}')
+          .pipe()
+          .subscribe((data: User[]) => {
+            this.users = data;
+          });
+      }
+    }
   }
   editOn() {
     // edition on/off method
@@ -100,5 +113,13 @@ export class LoggedComponent implements OnInit {
     }
     this.newPass = pass;
     this.newPass2 = pass;
+  }
+  selectUser(i) {
+    this.genPass();
+    this.users[i].token = this.auth.genToken(this.users[i].email, this.newPass);
+    this.auth.msg.message = `Password of user indetified by email: ${this.users[i].email} was succesfully changed to ${this.newPass}`;
+    // update serlected user passwd
+    this.auth.msg.returnUrl = '/logged';
+    this.router.navigate(['msg']);
   }
 }

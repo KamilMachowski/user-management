@@ -10,10 +10,11 @@ import { Msg } from './_models/msg';
 })
 export class AuthService {
   currentUser: User;
-  msg: Msg =new Msg();
+  users:User[];
+  msg: Msg;
   constructor(private api: ApiService, private router: Router) {
-    this.msg.message='This is default message';
-    this.msg.returnUrl='';
+    //this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    this.msg = { "message":'This is default message', "logged": false, "returnUrl":''};
   }
 
   // this.auth.check(email, pass);
@@ -34,14 +35,12 @@ export class AuthService {
           this.msg.returnUrl = '';
         } else if (data[0]) {
           console.log(`Data: ${data[0]}`); // ok
-          this.currentUser = data[0];
+          this.currentUser = data[0];        
           this.msg.logged = true;
           this.msg.returnUrl = '/logged';
         }
         this.router.navigate([this.msg.returnUrl]);
-        //localStorage.setItem('currentUser', JSON.stringify(user));
-        //this.currentUserSubject.next(user);
-        //return user;
+        //localStorage.setItem('currentUser', JSON.stringify(data[0]));
       })
     );
   }
@@ -60,17 +59,4 @@ export class AuthService {
     this.currentUser = new User();
     this.msg.logged = false;
   }
-  // login(token) {
-  //   this.api.getData(token).subscribe(data => {
-  //     if (data[0] === undefined) {
-  //       console.log('No such user or wrong password');
-  //       this.currentUser = undefined;
-  //       this.logged = false;
-  //     } else {
-  //       console.log(`Data: ${data[0]}`); // ok
-  //       this.currentUser = data[0];
-  //       this.logged = true;
-  //     }
-  //   });
-  // }
 }
