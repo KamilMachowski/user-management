@@ -9,8 +9,8 @@ import { map, filter, switchMap } from 'rxjs/operators'
 export class ApiService {
 
   constructor(private http: HttpClient) { }
-  getData(token: string) {
-    return this.http.get(`http://localhost:3000/read?token={"token":"${token}"}`);
+  getData(query: string) {
+    return this.http.get(`http://localhost:3000/read?query=${query}`);
   }
 
   postData(data: string) {

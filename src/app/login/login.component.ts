@@ -23,12 +23,12 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.auth.currentUser = new User();
-    this.auth.logged = false;
+    this.auth.msg.logged = false;
   }
-  submit(email: string, pass: string) {
+  submit() {
     this.loading = true;
     this.auth.currentUser = undefined;
-    const token = this.auth.genToken(email, pass);
+    const token = this.auth.genToken(this.email, this.pass);
     this.auth
       .login(token)
       .pipe(first())

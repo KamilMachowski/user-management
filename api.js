@@ -40,7 +40,7 @@ var server = app.listen(process.env.PORT || 3000, function() {
 
 //GET API
 app.get('/read', function(req, res) {
-  var query = req.query.token;
+  var query = req.query.query;
   console.log(`query=${query}`);
   query = JSON.parse(query);
 

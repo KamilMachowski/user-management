@@ -26,7 +26,7 @@ export class LoggedComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.auth.currentUser;
-    if (!this.auth.logged) this.router.navigate(['']);
+    if (!this.auth.msg.logged) this.router.navigate(['']);
     //    console.log(`data from logged ${this.auth.currentUser}`);
   }
   editOn() {
@@ -53,7 +53,7 @@ export class LoggedComponent implements OnInit {
   }
   update() {
     // console.log(this.item);
-  console.log(this.currentUser.country);
+    //console.log(this.currentUser.country);
     const data = JSON.stringify(this.currentUser);
     this.api.putData(data).subscribe(res => console.log(res));
     // API response: Item ${item.id} successfully updated
@@ -69,7 +69,9 @@ export class LoggedComponent implements OnInit {
         .deleteData(this.currentUser._id)
         .subscribe(res => console.log(res));
       this.auth.logout();
-      this.router.navigate(['']);
+      this.auth.msg.message = `User ${this.currentUser.name} ${this.currentUser.surname} succesfully deleted. Now you will be redirected to login page within 5 sec.`;
+      this.auth.msg.returnUrl = '';
+      this.router.navigate(['/msg']);
     }
     // API response: Item ${itemId} successfully deleted
   }
@@ -83,6 +85,9 @@ export class LoggedComponent implements OnInit {
           this.newPass
         );
         this.update();
+        this.auth.msg.message = `Password succesfully changed to ${this.newPass}`;
+        this.auth.msg.returnUrl = '/logged';
+        this.router.navigate(['msg']);
       }
     }
   }

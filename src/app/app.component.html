@@ -1,7 +1,13 @@
 <!-- nav -->
-<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="this.auth.logged === true">
+<nav
+  class="navbar navbar-expand navbar-dark bg-dark"
+  *ngIf="this.auth.msg.logged === true"
+>
   <div class="navbar-nav">
     <a class="nav-item nav-link" (click)="logout()">Logout</a>
+    <a class="nav-item nav-link disabled" *ngIf="this.auth.currentUser.admin === true"
+      >Logged with administrative privileges!!!
+    </a>
   </div>
 </nav>
 
