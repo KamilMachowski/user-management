@@ -1,9 +1,9 @@
 import { Component, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
 import { User } from '../_models/user';
 import { EventEmitter } from 'events';
-import { send } from 'q';
+import { AuthService } from '../auth.service';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -14,15 +14,32 @@ export class LoginComponent implements OnInit {
   email: string;
   pass: string;
   loading: boolean = false;
+  confirmed: boolean = false;
+  returnUrl = '/logged';
+  currentUser: User[];
 
-  @Output() dataEvent = new EventEmitter();
-  constructor(private auth: AuthService, private router: Router) {}
+  @Output() dataEvent: EventEmitter = new EventEmitter();
+  constructor(private router: Router, private auth: AuthService) {}
 
-  ngOnInit() {}
-  submit(email, pass) {
-    this.auth.check(email, pass);
-    console.log(this.auth.currentUser);
-    this.dataEvent.emit(JSON.stringify(this.auth.currentUser));
-    //this.router.navigate(['/logged']);
+  ngOnInit() {
+    this.auth.currentUser = new User();
+    this.auth.logged = false;
+  }
+  submit(email: string, pass: string) {
+    this.loading = true;
+    this.auth.currentUser = undefined;
+    const token = this.auth.genToken(email, pass);
+    this.auth
+      .login(token)
+      .pipe(first())
+      .subscribe(
+        data => {
+          console.log(this.auth.currentUser);
+        },
+        error => {
+          //this.alertService.error(error);
+          this.loading = false;
+        }
+      );
   }
 }

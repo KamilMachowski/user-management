@@ -8,6 +8,6 @@ export class User{
     city: string;
     country: string;
     email: string;
-    pass: string;
+    token: string;
     admin: boolean;
 }

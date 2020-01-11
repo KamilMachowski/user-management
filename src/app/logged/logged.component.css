@@ -1,0 +1,16 @@
+.data{
+    width: 100px;
+}
+.pass{
+    width: 200px;
+}
+.btn {
+    width: 245px;
+    margin-bottom: 15px ;
+}
+#deleteBtn{
+    float: right;
+}
+#changePassBtn{
+    width: 510px;
+}

@@ -43,8 +43,8 @@
       placeholder="Password"
     />
   </div>
-  <button (click)="submit(email, pass)" class="btn btn-primary">Sign in</button>
-
+  <button (click)="submit(email, pass)" class="btn btn-primary"><span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>Sign in</button>
+  <button (click)="getData()" class="btn btn-primary">get data</button>
   <div class="dropdown-divider"></div>
   <a class="dropdown-item" routerLink="register">New around here? Sign up</a>
   <!-- <a class="dropdown-item" href="#">Forgot password?</a> -->

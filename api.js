@@ -40,7 +40,7 @@ var server = app.listen(process.env.PORT || 3000, function() {
 
 //GET API
 app.get('/read', function(req, res) {
-  var query = req.query.search;
+  var query = req.query.token;
   console.log(`query=${query}`);
   query = JSON.parse(query);
 
@@ -70,7 +70,7 @@ app.get('/read', function(req, res) {
 //POST API
 app.post('/create', function(req, res) {
   req.on('data', item => {
-    console.log(`dostałem ${item}`);
+    // console.log(`dostałem ${item}`);
     item = JSON.parse(item);
     mc.connect(
       url,
@@ -84,9 +84,9 @@ app.post('/create', function(req, res) {
         dbo.collection('users').insertOne(item, function(err, res) {
           if (err) throw err;
           db.close();
-          console.log(
-            `New item successfully added under record no. ${res.insertedId}`
-          );
+          // console.log(
+          //   `New item successfully added under record no. ${res.insertedId}`
+          // );
         });
       }
     );
@@ -95,30 +95,57 @@ app.post('/create', function(req, res) {
 });
 
 // //PUT API
-// app.put('/update', function(req, res) {
-//   req.on('data', item => {
-//     item = JSON.parse(item);
-//     var sqlQuery = `UPDATE chemicals SET smiles='${item.smiles}', cas='${item.cas}', name='${item.name}',
-//        quantity='${item.quantity}', supplier='${item.supplier}', location='${item.location}' WHERE id=${item.id}`;
-//     var apiResponse = `Item ${item.id} successfully updated`;
-
-//     db.query(sqlQuery, function(error) {
-//       if (error) throw error;
-//       res.send(apiResponse);
-//     });
-//   });
-// });
+app.put('/update', function(req, res) {
+  req.on('data', item => {
+    newVal = `{$set: ${item}}`;
+    item = JSON.parse(item);
+    id = `{"_id":"${item._id}"}`;
+    console.log(newVal);
+    mc.connect(
+      url,
+      {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+      },
+      function(err, db) {
+        if (err) throw err;
+        var dbo = db.db('angular');
+        dbo.collection('users').updateOne(id, newVal,{upsert:true}, function(err, res) {
+          if (err) throw err;
+          db.close();
+        });
+      }
+    );
+  });
+});
 
 // // DELETE API
-// app.delete('/delete/:itemId', function(req, res) {
-//   var itemId = req.params.itemId;
-//   var sqlQuery = `DELETE FROM chemicals WHERE id=${itemId}`;
-//   var apiResponse = `Item ${itemId} successfully deleted`;
-//   //var sqlQuery = db.query(`DELETE FROM chemicals WHERE id=${itemId}`);
+app.delete('/delete/:itemId', function(req, res) {
+  var itemId = JSON.parse(`{"_id":"${req.params.itemId}"}`);
+  console.log(itemId);
+  mc.connect(
+    url,
+    {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    },
+    function(err, db) {
+      if (err) throw err;
+      var dbo = db.db('angular');
+      dbo.collection('users').deleteOne(itemId, function(err, record) {
+        if (err) throw err;
+        db.close();
+      });
+    }
+  );
 
-//   db.query(sqlQuery, function(error) {
-//     if (error) throw error;
-//     res.send(apiResponse);
-//   });
-//   //executeQuery(query, apiResponse);
-// });
+  //   var sqlQuery = `DELETE FROM chemicals WHERE id=${itemId}`;
+  //   var apiResponse = `Item ${itemId} successfully deleted`;
+  //   //var sqlQuery = db.query(`DELETE FROM chemicals WHERE id=${itemId}`);
+
+  //   db.query(sqlQuery, function(error) {
+  //     if (error) throw error;
+  //     res.send(apiResponse);
+  //   });
+  //   //executeQuery(query, apiResponse);
+});

@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { User } from './_models/user';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -10,17 +8,9 @@ import { AuthService } from './auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  currentUser: User;
-
-  constructor(private router: Router, private auth: AuthService) {
-    // this.auth.share().subscribe((x: User) => {this.currentUser = x});
-  }
-  recieveData($event: string) {
-    this.currentUser = JSON.parse($event);
-    console.log(`data in app comp: ${this.currentUser}`)
-  }
+  constructor(private router: Router, public auth: AuthService) {}
   logout() {
-    // this.authenticationService.logout();
-    this.router.navigate(['/login']);
+    this.auth.logout();
+    this.router.navigate(['']);
   }
 }

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, filter, switchMap } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root'
@@ -7,8 +9,8 @@ import { HttpClient } from '@angular/common/http';
 export class ApiService {
 
   constructor(private http: HttpClient) { }
-  getData(search: string) {
-    return this.http.get(`http://localhost:3000/read?search=${search}`);
+  getData(token: string) {
+    return this.http.get(`http://localhost:3000/read?token={"token":"${token}"}`);
   }
 
   postData(data: string) {
@@ -19,7 +21,7 @@ export class ApiService {
      return this.http.put(`http://localhost:3000/update`, data);
   }
 
-  deleteData(id: number) {
+  deleteData(id: string) {
      return this.http.delete(`http://localhost:3000/delete/${id}`);
   }
 }

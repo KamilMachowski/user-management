@@ -1,4 +1,4 @@
-<!-- <h2>Hello, {{currentUser.name}} {{currentUser.surname}}</h2> -->
+<h2>Hello, {{currentUser.name}} {{currentUser.surname}}</h2>
 <!-- <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 <div class="form-group">
   <label for="username">Username</label>
@@ -23,29 +23,81 @@
 </div>
 </form> -->
 <div class="container">
-  <div class="form-group">
-    <label for="email">Email address</label>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text data">E-mail</span>
+    </div>
     <input
-      [(ngModel)]="email"
-      type="email"
-      class="form-control"
       id="email"
-      placeholder="email@example.com"
-    />
-  </div>
-  <div class="form-group">
-    <label for="password">Password</label>
-    <input
-      [(ngModel)]="pass"
-      type="password"
+      type="text"
       class="form-control"
-      id="password"
-      placeholder="Password"
+      disabled
+      [(ngModel)]="currentUser.email"
     />
   </div>
-  <button (click)="submit(email, pass)" class="btn btn-primary">Sign in</button>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text data">City</span>
+    </div>
+    <input
+      id="city"
+      type="text"
+      class="form-control"
+      disabled
+      [(ngModel)]="currentUser.city"
+    />
+  </div>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text data">Country</span>
+    </div>
+    <input
+      id="country"
+      type="text"
+      class="form-control"
+      disabled
+      [(ngModel)]="currentUser.country"
+    />
+  </div>
+  <button id="editBtn" (click)="editOn()" class="btn btn-primary">
+    {{editBtn}}
+  </button>
+  <button id="deleteBtn" (click)="delete()" class="btn btn-danger">
+    Delete User
+  </button>
+  <div *ngIf="passChange">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text pass">Old Password</span>
+      </div>
+      <input type="password" class="form-control" [(ngModel)]="oldPass" />
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text pass">New Password</span>
+      </div>
+      <input
+        type="password"
+        class="form-control"
+        [(ngModel)]="newPass"
+      />
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text pass">Repeat New Password</span>
+      </div>
+      <input
+        type="password"
+        class="form-control"
+        [(ngModel)]="newPass2"
+      />
+    </div>
+    <button id="genPassBtn" (click)="genPass()" class="btn btn-warning">
+      Geneate Password
+    </button>
+  </div>
 
-  <div class="dropdown-divider"></div>
-  <a class="dropdown-item" routerLink="register">New around here? Sign up</a>
-  <!-- <a class="dropdown-item" href="#">Forgot password?</a> -->
+  <button id="changePassBtn" (click)="changePass()" class="btn btn-primary">
+    Change Password
+  </button>
 </div>
