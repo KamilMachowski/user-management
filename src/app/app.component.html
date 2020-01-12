@@ -1,6 +1,6 @@
 <!-- nav -->
 <nav class="navbar fixed-top navbar-expand navbar-dark bg-dark">
-  <div class="navbar-nav nav-justify">
+  <div class="navbar-nav">
     <div *ngIf="this.auth.msg.logged === true" class="navbar-nav">
       <a class="nav-item nav-link" (click)="logout()">Logout</a>
       <a
@@ -9,7 +9,7 @@
         >Logged with administrative privileges!!!
       </a>
     </div>
-    <a class="nav-item nav-link" routerLink=''>Home</a>
+    <a *ngIf="this.auth.msg.logged === false" class="nav-item nav-link" routerLink=''>Home</a>
   </div>
 </nav>
 
