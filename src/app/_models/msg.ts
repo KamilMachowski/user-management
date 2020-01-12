@@ -1,5 +1,6 @@
 export class Msg {
-  message: string;
+  msg1: string;
+  msg2: string;
   logged: boolean;
   returnUrl: string;
 }

@@ -1,9 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../_models/user';
-import { AuthService } from '../auth.service';
-import { ApiService } from '../api.service';
-import { PrintService } from '../print.service';
+import { AuthService } from '../_services/auth.service';
+import { ApiService } from '../_services/api.service';
 
 @Component({
   selector: 'app-logged',
@@ -17,14 +16,13 @@ export class LoggedComponent implements OnInit {
   oldPass = '';
   newPass = '';
   newPass2 = '';
-  users: User[];
+  @Input() users: User[];
   @Input() currentUser: User;
   @Input() editBtn = 'Edit Personal Data';
   constructor(
     private router: Router,
     private auth: AuthService,
-    private api: ApiService,
-    private print :PrintService
+    private api: ApiService
   ) {}
 
   ngOnInit() {
@@ -32,21 +30,12 @@ export class LoggedComponent implements OnInit {
     else {
       this.currentUser = this.auth.currentUser;
       this.api.getWeather(this.currentUser.city).subscribe();
-      if (this.currentUser.admin) {
-        this.api
-          .getData('{}')
-          .pipe()
-          .subscribe((data: User[]) => {
-            this.users = data;
-          });
-      }
     }
   }
   editOn() {
     // edition on/off method
     this.editable = !this.editable;
     if (this.editable) {
-      document.getElementById('email').removeAttribute('disabled');
       document.getElementById('city').removeAttribute('disabled');
       document.getElementById('country').removeAttribute('disabled');
       document
@@ -54,7 +43,6 @@ export class LoggedComponent implements OnInit {
         .classList.replace('btn-primary', 'btn-success');
       this.editBtn = 'Update Personal Data';
     } else {
-      document.getElementById('email').setAttribute('disabled', '');
       document.getElementById('city').setAttribute('disabled', '');
       document.getElementById('country').setAttribute('disabled', '');
       document
@@ -65,28 +53,24 @@ export class LoggedComponent implements OnInit {
     }
   }
   update() {
-    // console.log(this.item);
-    //console.log(this.currentUser.country);
-    const data = JSON.stringify(this.currentUser);
-    this.api.putData(data).subscribe(res => console.log(res));
-    // API response: Item ${item.id} successfully updated
+    this.api
+      .putData(
+        `{"email":"${this.currentUser.email}","city":"${this.currentUser.city}","country":"${this.currentUser.country}","token":"${this.currentUser.token}"}`
+      )
+      .subscribe();
   }
   delete() {
-    console.log(`Item ID: ${this.currentUser._id} will be deleted from DB`);
     if (
       confirm(
         `User ${this.currentUser.name} ${this.currentUser.surname} will be deleted from DB. This operation is irreversible. Are you sure?`
       )
     ) {
-      this.api
-        .deleteData(this.currentUser._id)
-        .subscribe(res => console.log(res));
-      this.auth.logout();
-      this.auth.msg.message = `User ${this.currentUser.name} ${this.currentUser.surname} succesfully deleted. Now you will be redirected to login page within 5 sec.`;
-      this.auth.msg.returnUrl = '';
-      this.router.navigate(['/msg']);
+      this.api.deleteData(this.currentUser.email).subscribe();
+      this.auth.logout(
+        `User ${this.currentUser.name} ${this.currentUser.surname} succesfully deleted.`,
+        ''
+      );
     }
-    // API response: Item ${itemId} successfully deleted
   }
   changePass() {
     this.passChange = !this.passChange;
@@ -98,28 +82,38 @@ export class LoggedComponent implements OnInit {
           this.newPass
         );
         this.update();
-        this.auth.msg.message = `Password succesfully changed to ${this.newPass}`;
-        this.auth.msg.returnUrl = '/logged';
-        this.router.navigate(['msg']);
+        this.msgGen(this.currentUser.email);
       }
     }
   }
-  genPass() {
-    const length = 8,
-      charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let pass = '';
-    for (var i = 0, n = charset.length; i < length; ++i) {
-      pass += charset.charAt(Math.floor(Math.random() * n));
-    }
-    this.newPass = pass;
-    this.newPass2 = pass;
-  }
-  selectUser(i) {
-    this.genPass();
-    this.users[i].token = this.auth.genToken(this.users[i].email, this.newPass);
-    this.auth.msg.message = `Password of user indetified by email: ${this.users[i].email} was succesfully changed to ${this.newPass}`;
-    // update serlected user passwd
+  msgGen(email) {
+    this.auth.msg.msg1 = `Password of user ${email} was succesfully changed.`;
+    this.auth.msg.msg2 = `New password is set to ${this.newPass}`;
     this.auth.msg.returnUrl = '/logged';
     this.router.navigate(['msg']);
+  }
+  genPass() {
+    this.newPass = this.newPass2 = this.auth.passGenerator();
+  }
+  getUsers() {
+    if (this.users === undefined) {
+      this.api
+        .getData('{}')
+        .pipe()
+        .subscribe((data: User[]) => {
+          this.users = data;
+          console.log(this.users);
+        });
+    }
+  }
+  selectUser(i: number) {
+    this.genPass();
+    this.users[i].token = this.auth.genToken(this.users[i].email, this.newPass);
+    this.api
+      .putData(
+        `{"email":"${this.users[i].email}","token":"${this.users[i].token}"}`
+      )
+      .subscribe();
+    this.msgGen(this.users[i].email);
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { Wth } from './_models/wth';
+import { Wth } from '../_models/wth';
+import { User } from '../_models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -21,15 +22,15 @@ export class ApiService {
         map((data: Wth) => {
           this.temp = (data.main.temp - 273.15).toFixed(0);
           this.hum = data.main.humidity;
-          console.log(this.temp, this.hum);
-        })
+         })
       );
   }
   getData(query: string) {
     return this.http.get(`http://localhost:3000/read?query=${query}`);
   }
 
-  postData(data: string) {
+  postData(user: User) {
+    const data = JSON.stringify(user);
     return this.http.post(`http://localhost:3000/create`, data);
   }
 
@@ -37,7 +38,7 @@ export class ApiService {
     return this.http.put(`http://localhost:3000/update`, data);
   }
 
-  deleteData(id: string) {
-    return this.http.delete(`http://localhost:3000/delete/${id}`);
+  deleteData(email: string) {
+    return this.http.delete(`http://localhost:3000/delete/${email}`);
   }
 }

@@ -78,7 +78,7 @@
   <div class="row">
     <div class="col">
       <div *ngIf="currentUser.admin" ngbDropdown class="d-inline-block">
-        <button id="usersMange" class="btn btn-outline-secondary" ngbDropdownToggle>
+        <button id="usersManage" (click)="getUsers()" class="btn btn-outline-secondary" ngbDropdownToggle>
           Select user to change password:
         </button>
         <div ngbDropdownMenu>
