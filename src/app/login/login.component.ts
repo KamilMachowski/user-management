@@ -12,6 +12,7 @@ import { first } from 'rxjs/operators';
 export class LoginComponent implements OnInit {
   email: string;
   pass: string;
+  invalid: string;
 
   constructor(private router: Router, private auth: AuthService) {}
 
@@ -26,6 +27,12 @@ export class LoginComponent implements OnInit {
     this.auth
       .login(token)
       .pipe(first())
-      .subscribe();
+      .subscribe(() => {
+        if (!this.auth.loading) {
+          this.email = '';
+          this.pass = '';
+          this.invalid = 'Please type correct email-password pair.';
+        }
+      });
   }
 }

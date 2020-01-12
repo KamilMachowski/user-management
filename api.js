@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 //CORS Middleware
 
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   //Enabling CORS
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -29,17 +29,10 @@ app.use(function(req, res, next) {
 });
 
 //Setting up server
-const server = app.listen(process.env.PORT || 3000, function() {
+const server = app.listen(process.env.PORT || 3000, () => {
   const port = server.address().port;
   console.log('App now running on port', port);
 });
-
-//Initiallising connection string
-
-// db.connect(function(err) {
-//   if (err) throw err;
-// });
-//Function to connect to database and execute query
 
 //GET API
 app.get('/read', (req, res) => {
@@ -53,13 +46,12 @@ app.get('/read', (req, res) => {
     },
     (err, db) => {
       if (err) throw err;
-      const dbo = db.db('angular');
-      dbo
+      db.db('angular')
         .collection('users')
         .find(query)
-        .toArray(function(err, record) {
+        .toArray((err, record) => {
           if (err) throw err;
-          res.send(record)
+          res.send(record);
           db.close();
         });
     }
@@ -67,7 +59,7 @@ app.get('/read', (req, res) => {
 });
 
 //POST API
-app.post('/create', function(req, res) {
+app.post('/create', (req, res) => {
   req.on('data', item => {
     item = JSON.parse(item);
     mc.connect(
@@ -76,36 +68,11 @@ app.post('/create', function(req, res) {
         useUnifiedTopology: true,
         useNewUrlParser: true
       },
-      function(err, db) {
+      (err, db) => {
         if (err) throw err;
-        const dbo = db.db('angular');
-        dbo.collection('users').insertOne(item, function(err, res) {
-          if (err) throw err;
-          db.close();
-        });
-      }
-    );
-  });
-  res.send(`New item successfully added`);
-});
-
-// //PUT API
-app.put('/update', function(req, res) {
-  req.on('data', item => {
-    item = JSON.parse(item);
-    console.log(item);
-    mc.connect(
-      url,
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      },
-      function(err, db) {
-        if (err) throw err;
-        const dbo = db.db('angular');
-        dbo
+        db.db('angular')
           .collection('users')
-          .findOneAndUpdate({email: item.email}, { $set: {city:item.city,country:item.country,token:item.token} }, function(err, res) {
+          .insertOne(item, (err, res) => {
             if (err) throw err;
             db.close();
           });
@@ -114,8 +81,42 @@ app.put('/update', function(req, res) {
   });
 });
 
+// //PUT API
+app.put('/update', (req, res) => {
+  console.log('sdgh');
+  req.on('data', item => {
+    item = JSON.parse(item);
+    mc.connect(
+      url,
+      {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+      },
+      (err, db) => {
+        if (err) throw err;
+        db.db('angular')
+          .collection('users')
+          .findOneAndUpdate(
+            { email: item.email },
+            {
+              $set: {
+                city: item.city,
+                country: item.country,
+                token: item.token
+              }
+            },
+            (err, res) => {
+              if (err) throw err;
+              db.close();
+            }
+          );
+      }
+    );
+  });
+});
+
 // // DELETE API
-app.delete('/delete/:itemEmail', function(req, res) {
+app.delete('/delete/:itemEmail', (req, res) => {
   const itemEmail = req.params.itemEmail;
   console.log(itemEmail);
   mc.connect(
@@ -124,13 +125,14 @@ app.delete('/delete/:itemEmail', function(req, res) {
       useUnifiedTopology: true,
       useNewUrlParser: true
     },
-    function(err, db) {
+    (err, db) => {
       if (err) throw err;
-      const dbo = db.db('angular');
-      dbo.collection('users').findOneAndDelete({ email: itemEmail }, function(err, record) {
-        if (err) throw err;
-        db.close();
-      });
+      db.db('angular')
+        .collection('users')
+        .findOneAndDelete({ email: itemEmail }, (err, record) => {
+          if (err) throw err;
+          db.close();
+        });
     }
   );
 });

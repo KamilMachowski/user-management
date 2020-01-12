@@ -12,10 +12,10 @@ import { ApiService } from '../_services/api.service';
 export class LoggedComponent implements OnInit {
   editable = false;
   passChange = false;
-
   oldPass = '';
   newPass = '';
   newPass2 = '';
+
   @Input() users: User[];
   @Input() currentUser: User;
   @Input() editBtn = 'Edit Personal Data';
@@ -26,8 +26,10 @@ export class LoggedComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // reditect to login page if not logged
     if (!this.auth.msg.logged) this.router.navigate(['']);
     else {
+      // set uesr data and get temp/humidity
       this.currentUser = this.auth.currentUser;
       this.api.getWeather(this.currentUser.city).subscribe();
     }
@@ -53,11 +55,8 @@ export class LoggedComponent implements OnInit {
     }
   }
   update() {
-    this.api
-      .putData(
-        `{"email":"${this.currentUser.email}","city":"${this.currentUser.city}","country":"${this.currentUser.country}","token":"${this.currentUser.token}"}`
-      )
-      .subscribe();
+    const data = `{"email":"${this.currentUser.email}","city":"${this.currentUser.city}","country":"${this.currentUser.country}","token":"${this.currentUser.token}"}`;
+    this.api.putData(data).subscribe();
   }
   delete() {
     if (

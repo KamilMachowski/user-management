@@ -10,8 +10,6 @@ import { AuthService } from './_services/auth.service';
 export class AppComponent {
   constructor(private router: Router, public auth: AuthService) {}
   logout() {
-    this.auth.logout(`User ${this.auth.currentUser.name} ${this.auth.currentUser.surname} succesfully logged out.`,`Now you will be redirected to login page within 5 sec.`);
-    this.auth.msg.returnUrl = '';
-    this.router.navigate(['/msg']);
+    this.auth.logout(`User ${this.auth.currentUser.name} ${this.auth.currentUser.surname} succesfully logged out.`,`Redirection to login page within 3 sec.`);
   }
 }

@@ -36,7 +36,7 @@ export class RegisterComponent implements OnInit {
             );
             this.api.postData(this.newUser).subscribe();
             this.auth.msg.msg1 = `User ${this.newUser.name} ${this.newUser.surname} succesfully added.`;
-            this.auth.msg.msg2 = `Now you will be redirected to login page within 5 sec.`;
+            this.auth.msg.msg2 = `Redirection to login page within 3 sec.`;
             this.auth.msg.returnUrl = '';
             this.router.navigate(['/msg']);
           } else {

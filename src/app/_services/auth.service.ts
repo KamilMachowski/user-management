@@ -38,11 +38,12 @@ export class AuthService {
     return this.api.getData(query).pipe(
       map((data: User[]) => {
         if (data[0] === undefined) {
+          // user not exist in db
           this.currentUser = undefined;
           this.msg.logged = false;
           this.msg.returnUrl = '';
         } else if (data[0]) {
-          console.log(`Data: ${data[0]}`);
+          // user present in db, loading data
           this.currentUser = data[0];
           this.msg.logged = true;
           this.msg.returnUrl = '/logged';
